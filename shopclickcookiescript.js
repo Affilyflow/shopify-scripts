@@ -1,4 +1,3 @@
-  <script>
   console.log("Script execution started");
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -29,9 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
       console.log("Set cookies for all parameters and full URL:", document.cookie);
     }
   });
-</script>
 
-<script>
   console.log("Running Click Tracking Script");
 
   function getQueryParam(param) {
@@ -68,4 +65,3 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   console.log("Script processing completed");
 });
-</script>
