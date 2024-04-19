@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var network = getQueryParam('network');
     var store = getQueryParam('store');
 
-    if (aff_id && network === 'affilyflow') {
+    if (aff_id && network === 'AffilyFlow') {
         fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/Affiliate_clicks', {
             method: 'POST',
             headers: {
