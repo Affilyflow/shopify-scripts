@@ -9,7 +9,7 @@
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toUTCString();
       }
-      document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -27,12 +27,13 @@
     }
   });
 </script>
+
 <script>
   console.log("Running Click Tracking Script");
 
   function getQueryParam(param) {
     var result = window.location.search.match(
-        new RegExp("(\\?|&)" + param + "(\\[\\])?=([^&]*)")
+      new RegExp("(\\?|&)" + param + "(\\[\\])?=([^&]*)")
     );
     return result ? result[3] : null;
   }
@@ -43,7 +44,7 @@
     var store = getQueryParam('store');
     console.log("URL Parameters:", aff_id, network, store);
 
-    if (&& network === 'AffilyFlow') {
+    if (aff_id && network === 'AffilyFlow') {  // Corrected line here
         console.log("Sending click data...");
         fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/Affiliate_clicks', {
             method: 'POST',
