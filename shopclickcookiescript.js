@@ -1,6 +1,9 @@
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    console.log("Running Cookie Capturing Script");
+  console.log("Script execution started");
+
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("DOMContentLoaded event fired");
+
 
     function setCookie(name, value, days) {
       let expires = "";
@@ -63,5 +66,6 @@
     } else {
         console.log("No valid data to send.");
     }
-  });
+  console.log("Script processing completed");
+});
 </script>
