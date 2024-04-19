@@ -1,4 +1,4 @@
-<script>
+
   document.addEventListener("DOMContentLoaded", function() {
     console.log("Running Cookie Capturing Script");
 
@@ -26,9 +26,7 @@
       console.log("Set cookies for all parameters and full URL:", document.cookie);
     }
   });
-</script>
 
-<script>
   console.log("Running Click Tracking Script");
 
   function getQueryParam(param) {
@@ -44,7 +42,7 @@
     var store = getQueryParam('store');
     console.log("URL Parameters:", aff_id, network, store);
 
-    if (aff_id && network === 'AffilyFlow') {  // Corrected line here
+    if (network === 'AffilyFlow') {  // Corrected line here
         console.log("Sending click data...");
         fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/Affiliate_clicks', {
             method: 'POST',
@@ -64,4 +62,4 @@
         console.log("No valid data to send.");
     }
   });
-</script>
+
