@@ -1,4 +1,4 @@
-
+<script>
   document.addEventListener("DOMContentLoaded", function() {
     console.log("Running Cookie Capturing Script");
 
@@ -26,7 +26,9 @@
       console.log("Set cookies for all parameters and full URL:", document.cookie);
     }
   });
+</script>
 
+<script>
   console.log("Running Click Tracking Script");
 
   function getQueryParam(param) {
@@ -62,4 +64,4 @@
         console.log("No valid data to send.");
     }
   });
-
+</script>
