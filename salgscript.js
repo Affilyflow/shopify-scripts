@@ -29,7 +29,7 @@
       console.log("Product Names: " + productNames.join(", "));
 
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", "https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/affiliate_sales_data", true);
+      xhr.open("POST", "https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/sales/salg", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       console.log("Preparing to send AJAX request");
 
