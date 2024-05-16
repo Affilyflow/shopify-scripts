@@ -76,7 +76,5 @@ function send_order_data_to_affiliate($order_id) {
             type: "heartbeat"
         }));
     }
-    </script>
-    <?php
 }
 
