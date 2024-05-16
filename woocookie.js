@@ -1,48 +1,50 @@
-add_action('woocommerce_thankyou', 'send_order_data_to_affiliate', 10, 1);
-
-function send_order_data_to_affiliate($order_id) {
-    $order = wc_get_order($order_id);
-
-    // Extracting order data
-    $order_total = $order->get_total();
-    $currency = $order->get_currency();
-    $product_names = [];
-
-    foreach ($order->get_items() as $item) {
-        $product_names[] = $item->get_name();
+document.addEventListener("DOMContentLoaded", function() {
+  function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toUTCString();
     }
-    $product_names = implode(", ", $product_names);
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  }
 
-    ?>
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        function getCookie(name) {
-            var value = "; " + document.cookie;
-            var parts = value.split("; " + name + "=");
-            if (parts.length === 2) return parts.pop().split(";").shift();
-        }
+  const urlParams = new URLSearchParams(window.location.search);
+  const affiliateId = urlParams.get('aff_id');
+  const network = urlParams.get('network');
+  const store = urlParams.get('store'); // Get 'store' parameter from the URL
 
-        console.log("JavaScript Loaded");
+  if (affiliateId && network && store) {
+    setCookie('affiliate_id', affiliateId, 40);
+    setCookie('network', network, 40);
+    setCookie('store', store, 40);
+    setCookie('full_url', window.location.href, 40);
+  }
+});
 
-        var aff_id = getCookie('affiliate_id');
-        var network = getCookie('network');
-        var store = getCookie('store');
-        var fullUrl = getCookie('full_url');
+function getQueryParam(param) {
+  var result = window.location.search.match(
+    new RegExp("(\\?|&)" + param + "(\\[\\])?=([^&]*)")
+  );
+  return result ? result[3] : null;
+}
 
-        var orderId = "<?php echo $order_id; ?>";
-        var orderTotal = "<?php echo $order_total; ?>";
-        var currency = "<?php echo $currency; ?>";
-        var productNames = "<?php echo $product_names; ?>";
+document.addEventListener('DOMContentLoaded', function() {
+  var aff_id = getQueryParam('aff_id');
+  var network = getQueryParam('network');
+  var store = getQueryParam('store');
 
-        console.log("Order ID: " + orderId);
-        console.log("Affiliate ID: " + aff_id);
-        console.log("Network: " + network);
-        console.log("Store: " + store);
-        console.log("Full URL: " + fullUrl);
-        console.log("Order Total: " + orderTotal);
-        console.log("Currency: " + currency);
-        console.log("Product Names: " + productNames);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "https://xepn-38qp-in4
-
+  if (network === 'AffilyFlow') {
+    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/Affiliate_clicks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ aff_id: aff_id, network: network, store: store })
+    })
+    .then(response => response.json())
+    .catch(error => {
+      // handle error
+    });
+  }
+});
