@@ -13,8 +13,6 @@ function send_order_data_to_affiliate($order_id) {
     }
     $product_names = implode(", ", $product_names);
 
-    ?>
-    <script>
     document.addEventListener("DOMContentLoaded", function() {
         function getCookie(name) {
             var value = "; " + document.cookie;
