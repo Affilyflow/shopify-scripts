@@ -17,17 +17,19 @@ document.addEventListener("DOMContentLoaded", function() {
     if (parts.length === 2) return parts.pop().split(';').shift();
   }
 
+  // Extract query parameters from the URL
   const urlParams = new URLSearchParams(window.location.search);
   const affiliateId = urlParams.get('aff_id');
   const network = urlParams.get('network');
   const store = urlParams.get('store'); // Get 'store' parameter from the URL
-  const referrer = document.referrer || "Direct"; // Get the referrer or set to "Direct"
+  const referrer = document.referrer || "Direct"; // Get the referrer or set to "Direct" if no referrer is available
 
   console.log('Affiliate ID:', affiliateId);
   console.log('Network:', network);
   console.log('Store:', store);
   console.log('Referrer:', referrer);
 
+  // Set cookies if all required parameters are present
   if (affiliateId && network && store) {
     setCookie('affiliate_id', affiliateId, 40);
     setCookie('network', network, 40);
@@ -46,14 +48,15 @@ document.addEventListener("DOMContentLoaded", function() {
   console.log('Current Cookies:', document.cookie);
 });
 
-function getQueryParam(param) {
-  var result = window.location.search.match(
-    new RegExp("(\\?|&)" + param + "(\\[\\])?=([^&]*)")
-  );
-  return result ? result[3] : null;
-}
-
 document.addEventListener('DOMContentLoaded', function() {
+  function getQueryParam(param) {
+    var result = window.location.search.match(
+      new RegExp("(\\?|&)" + param + "(\\[\\])?=([^&]*)")
+    );
+    return result ? result[3] : null;
+  }
+
+  // Extract query parameters and referrer
   var aff_id = getQueryParam('aff_id');
   var network = getQueryParam('network');
   var store = getQueryParam('store');
@@ -67,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('full_url:', full_url);
   console.log('referrer:', referrer);
 
+  // Send the data to the API if the network is 'affilyflow'
   if (network && (network.toLowerCase() === 'affilyflow')) {
     fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks', {
       method: 'POST',
