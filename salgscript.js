@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var fullUrl = getCookie('full_url'); // Retrieve the full URL cookie
         var orderTotal = Shopify.checkout.total_price;
         var currency = Shopify.checkout.currency;
+        var source = getCookie('refferer');
         
         // Get product IDs
         var productIds = Shopify.checkout.line_items.map(item => item.product_id);
@@ -46,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
             full_url: fullUrl,
             order_total: orderTotal,
             currency: currency,
-            product_names: productNames // Send product IDs as product_names
+            productIds: productNames // Send product IDs as product_names
         }));
 
         console.log("AJAX request sent");
