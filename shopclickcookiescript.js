@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const affiliateId = urlParams.get('aff_id');
   const network = urlParams.get('network');
   const store = urlParams.get('store'); // Get 'store' parameter from the URL
-  const source = document.referrer || "Direct"; // Get the referrer or set to "Direct" if no referrer is available
+  const referrer = document.referrer || "Direct"; // Get the referrer or set to "Direct" if no referrer is available
 
   console.log('Affiliate ID:', affiliateId);
   console.log('Network:', network);
