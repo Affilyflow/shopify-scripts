@@ -6,8 +6,9 @@ document.addEventListener("DOMContentLoaded", function() {
       date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
       expires = "; expires=" + date.toUTCString();
     }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    console.log(`Cookie set: ${name}=${value}; expires=${expires}; path=/`);
+    const cookieString = `${name}=${value || ""}${expires}; path=/;`;
+    document.cookie = cookieString;
+    console.log(`Cookie set: ${cookieString}`);
   }
 
   function getCookie(name) {
@@ -41,6 +42,8 @@ document.addEventListener("DOMContentLoaded", function() {
   if (!getCookie('referrer')) {
     setCookie('referrer', referrer, 40);
   }
+
+  console.log('Current Cookies:', document.cookie);
 });
 
 function getQueryParam(param) {
