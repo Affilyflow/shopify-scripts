@@ -57,15 +57,15 @@ document.addEventListener('DOMContentLoaded', function() {
   var aff_id = getQueryParam('aff_id');
   var network = getQueryParam('network');
   var store = getQueryParam('store');
-  var url = getQueryParam('full_url');
-  var source = getQueryParam('referrer');
+  var url = window.location.href; // Get the full URL of the current page
+  var referrer = document.referrer || "Direct"; // Get the referrer or set to "Direct"
 
   console.log('Query Parameters:');
   console.log('aff_id:', aff_id);
   console.log('network:', network);
   console.log('store:', store);
   console.log('full_url:', url);
-  console.log('referrer:', source);
+  console.log('referrer:', referrer);
 
   if (network && (network.toLowerCase() === 'affilyflow')) {
     fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks', {
@@ -77,7 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
         aff_id: aff_id, 
         network: network, 
         store: store,
-        referrer: document.referrer || "Direct" // Include the referrer in the payload
+        full_url: url, // Include the full URL in the payload
+        referrer: referrer // Include the referrer in the payload
       })
     })
     .then(response => response.json())
@@ -91,4 +92,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Network is not affilyflow');
   }
 });
-
