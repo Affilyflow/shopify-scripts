@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         xhr.send(JSON.stringify({
             aff_id: aff_id,
+            source: source,
             network: network,
             order_id: orderId,
             store: store,
