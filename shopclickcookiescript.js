@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var source = getQueryParam('referrer');
 
   if (network && (network.toLowerCase() === 'affilyflow')) {
-    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/click/click', {
+    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
