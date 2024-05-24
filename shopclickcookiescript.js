@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Send the data to the API if the network is 'affilyflow'
   if (network && (network.toLowerCase() === 'affilyflow')) {
-    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks', {
+    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks/click', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
