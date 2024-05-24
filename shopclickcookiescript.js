@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
     if (parts.length === 2) return parts.pop().split(';').shift();
   }
 
-  // Extract query parameters from the URL
   const urlParams = new URLSearchParams(window.location.search);
   const affiliateId = urlParams.get('aff_id');
   const network = urlParams.get('network');
@@ -29,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function() {
   console.log('Store:', store);
   console.log('Referrer:', referrer);
 
-  // Set cookies if all required parameters are present
   if (affiliateId && network && store) {
     setCookie('affiliate_id', affiliateId, 40);
     setCookie('network', network, 40);
@@ -72,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Send the data to the API if the network is 'affilyflow'
   if (network && (network.toLowerCase() === 'affilyflow')) {
-    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks/click', {
+    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -81,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         aff_id: aff_id, 
         network: network, 
         store: store,
-        url: full_url, // Include the full URL in the payload
+        full_url: full_url, // Include the full URL in the payload
         referrer: referrer // Include the referrer in the payload
       })
     })
@@ -96,3 +94,4 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Network is not affilyflow');
   }
 });
+
