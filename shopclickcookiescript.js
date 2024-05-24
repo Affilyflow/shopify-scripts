@@ -46,9 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
   var aff_id = getQueryParam('aff_id');
   var network = getQueryParam('network');
   var store = getQueryParam('store');
+  var url = getQueryParam('full_url');
+  var source = getQueryParam('referrer');
 
   if (network && (network.toLowerCase() === 'affilyflow')) {
-    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/Affiliate_clicks', {
+    fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/click/click', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
