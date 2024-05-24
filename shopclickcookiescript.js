@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         network: network, 
         store: store,
         full_url: full_url, // Include the full URL in the payload
-        refferer: refferer, // Include the referrer in the payload
+        refferer: refferer,  // Include the referrer in the payload
       })
     })
     .then(response => response.json())
