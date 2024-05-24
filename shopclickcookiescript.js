@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         aff_id: aff_id, 
         network: network, 
         store: store,
-        full_url: full_url, // Include the full URL in the payload
+        url: full_url, // Include the full URL in the payload
         referrer: referrer // Include the referrer in the payload
       })
     })
