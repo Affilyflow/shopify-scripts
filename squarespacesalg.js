@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (parts.length === 2) return parts.pop().split(";").shift();
     }
 
-    // Assuming Squarespace exposes checkout data via window.Squarespace
+    // Check if the Squarespace checkout object is available
     if (window.Squarespace && Squarespace.checkout) {
         console.log("Squarespace checkout object found");
         
@@ -40,6 +40,17 @@ document.addEventListener("DOMContentLoaded", function() {
         xhr.setRequestHeader("Content-Type", "application/json");
         console.log("Preparing to send AJAX request");
 
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log("AJAX request state: " + xhr.readyState);
+                if (xhr.status === 200) {
+                    console.log("AJAX request successful");
+                } else {
+                    console.error("AJAX request failed with status: " + xhr.status);
+                }
+            }
+        };
+
         xhr.send(JSON.stringify({
             aff_id: aff_id,
             refferer: refferer,
@@ -53,25 +64,43 @@ document.addEventListener("DOMContentLoaded", function() {
         }));
 
         console.log("AJAX request sent");
+    } else {
+        console.log("Squarespace checkout object not found");
     }
 });
 
 function sendHeartbeat() {
+    console.log("Preparing to send heartbeat");
     var storeUrl = window.location.origin; // Get the full base URL, including the scheme
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/scriptping", true);
     xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            console.log("Heartbeat request state: " + xhr.readyState);
+            if (xhr.status === 200) {
+                console.log("Heartbeat request successful");
+            } else {
+                console.error("Heartbeat request failed with status: " + xhr.status);
+            }
+        }
+    };
 
     xhr.send(JSON.stringify({
         store_id: storeUrl, // Use the full base URL as the store_id
         timestamp: new Date().toISOString(),
         type: "heartbeat"
     }));
+
+    console.log("Heartbeat request sent");
 }
 
 // Trigger the heartbeat function when an order is made
 document.addEventListener("DOMContentLoaded", function() {
     if (window.Squarespace && Squarespace.checkout) {
         sendHeartbeat();
+    } else {
+        console.log("Squarespace checkout object not found for heartbeat");
     }
 });
