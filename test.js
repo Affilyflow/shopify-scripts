@@ -1,4 +1,3 @@
-
 // Function to get cookie value by name
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -85,4 +84,6 @@ function sendHeartbeat() {
 // Trigger the heartbeat function directly
 if (window.Shopify && window.Shopify.checkout) {
     sendHeartbeat();
+    console.log("Heartbeat function executed.");
 }
+console.log("Script execution completed.");
