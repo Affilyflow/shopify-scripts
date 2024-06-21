@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("JavaScript Loaded");
+
 
     function getCookie(name) {
         var value = "; " + document.cookie;
