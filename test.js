@@ -5,8 +5,8 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
-// Subscribe to the checkout_completed event
-analytics.subscribe("checkout_completed", function(event) {
+// Function to send data to your custom endpoint
+function sendData(event) {
     console.log("Checkout completed event captured");
 
     // Log the entire event object to verify the data structure
@@ -65,7 +65,7 @@ analytics.subscribe("checkout_completed", function(event) {
     }));
 
     console.log("AJAX request sent");
-});
+}
 
 // Heartbeat function to ensure the script is running
 function sendHeartbeat() {
@@ -87,3 +87,4 @@ if (window.Shopify && window.Shopify.checkout) {
     console.log("Heartbeat function executed.");
 }
 console.log("Script execution completed.");
+
