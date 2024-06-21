@@ -8,8 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     if (window.Shopify && Shopify.checkout) {
-        console.log("Shopify checkout object found");
-        
+       
         var orderId = Shopify.checkout.order_id;
         var aff_id = getCookie('affiliate_id');
         var network = getCookie('network');
@@ -25,14 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Ensure product_names is scalar if there's only one item
         var productNames = productIds.length === 1 ? productIds[0] : productIds;
 
-        console.log("Order ID: " + orderId);
-        console.log("Affiliate ID: " + aff_id);
-        console.log("Network: " + network);
-        console.log("Store: " + store);
-        console.log("Full URL: " + fullUrl);
-        console.log("Order Total: " + orderTotal);
-        console.log("Currency: " + currency);
-        console.log("Product Names (IDs): " + (Array.isArray(productNames) ? productNames.join(", ") : productNames));
+      
 
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/sales/salg", true);
@@ -51,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
             productIds: productNames // Send product IDs as product_names
         }));
 
-        console.log("AJAX request sent");
+     
     }
 });
 
