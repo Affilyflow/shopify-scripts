@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Function to get a cookie by name
     function getCookie(name) {
         var value = "; " + document.cookie;
         var parts = value.split("; " + name + "=");
@@ -8,44 +7,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
     console.log("JavaScript Loaded");
 
-    // Retrieve cookies set during the user's session
+    // Retrieve cookies
     var aff_id = getCookie('affiliate_id');
     var network = getCookie('network');
     var store = getCookie('store');
     var fullUrl = getCookie('full_url');
 
-    // Scraping order data from the WooCommerce Thank You page (change the class selectors if needed)
-    var orderId = document.querySelector(".woocommerce-order-overview__order strong")
-        ? document.querySelector(".woocommerce-order-overview__order strong").textContent
-        : null;
+    // Ensure that orderData is available
+    if (typeof orderData !== 'undefined') {
+        var orderId = orderData.orderId;
+        var orderTotal = orderData.orderTotal;
+        var currency = orderData.currency;
+        var productNames = orderData.productNames;
 
-    var orderTotal = document.querySelector(".woocommerce-order-overview__total strong")
-        ? document.querySelector(".woocommerce-order-overview__total strong").textContent.replace(/[^0-9.]/g, '')
-        : null;
+        console.log("Order ID: " + orderId);
+        console.log("Affiliate ID: " + aff_id);
+        console.log("Network: " + network);
+        console.log("Store: " + store);
+        console.log("Full URL: " + fullUrl);
+        console.log("Order Total: " + orderTotal);
+        console.log("Currency: " + currency);
+        console.log("Product Names: " + productNames);
 
-    var currency = document.querySelector(".woocommerce-order-overview__total strong")
-        ? document.querySelector(".woocommerce-order-overview__total strong").textContent.replace(/[0-9,.]/g, '')
-        : null;
-
-    var productNames = Array.from(document.querySelectorAll(".woocommerce-order-details__name")).map(function(el) {
-        return el.textContent.trim();
-    }).join(", ");
-
-    console.log("Order ID: " + orderId);
-    console.log("Affiliate ID: " + aff_id);
-    console.log("Network: " + network);
-    console.log("Store: " + store);
-    console.log("Full URL: " + fullUrl);
-    console.log("Order Total: " + orderTotal);
-    console.log("Currency: " + currency);
-    console.log("Product Names: " + productNames);
-
-    // Ensure we have all necessary data before proceeding with the AJAX request
-    if (orderId && orderTotal && productNames) {
+        // Send data to the API
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/sales/salg", true);
         xhr.setRequestHeader("Content-Type", "application/json");
-        console.log("Preparing to send AJAX request");
 
         xhr.send(JSON.stringify({
             aff_id: aff_id,
@@ -60,23 +47,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
         console.log("AJAX request sent");
 
+        // Optional: send heartbeat
         sendHeartbeat();
     } else {
-        console.warn("Order data missing or incomplete, skipping AJAX request.");
+        console.warn("Order data is not available.");
     }
 });
 
-// Function to send a heartbeat request to the server
 function sendHeartbeat() {
-    var storeUrl = window.location.origin; // Get the full base URL
+    var storeUrl = window.location.origin;
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/scriptping", true);
     xhr.setRequestHeader("Content-Type", "application/json");
 
-    // Sending heartbeat data
     xhr.send(JSON.stringify({
-        store_id: storeUrl, // Use the full base URL as the store_id
+        store_id: storeUrl,
         timestamp: new Date().toISOString(),
         type: "heartbeat"
     }));
 }
+
