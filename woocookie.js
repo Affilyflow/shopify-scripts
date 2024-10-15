@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() { 
   function setCookie(name, value, days) {
     let expires = "";
     if (days) {
@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
   var network = getQueryParam('network');
   var store = getQueryParam('store');
 
-  if (network === 'AffilyFlow') {
+  // Make the network check case-insensitive by converting to lowercase
+  if (network && network.toLowerCase() === 'affilyflow'.toLowerCase()) {
     fetch('https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks/click', {
       method: 'POST',
       headers: {
@@ -43,8 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
       body: JSON.stringify({ aff_id: aff_id, network: network, store: store })
     })
     .then(response => response.json())
+    .then(data => {
+      console.log("API response:", data);  // Log response for debugging
+    })
     .catch(error => {
-      // handle error
+      console.error("API fetch error:", error);  // Log errors for debugging
     });
   }
 });
