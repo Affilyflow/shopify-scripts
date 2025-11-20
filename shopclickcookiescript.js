@@ -50,6 +50,8 @@ document.addEventListener("DOMContentLoaded", function() {
     setCookie("store", store, 40);
     setCookie("full_url", fullUrl, 40);
     setCookie("referrer", referrer, 40);
+    setCookie("affiliate_set_at", new Date().toISOString(), 40);
+
   }
 
   // Sørg for at referrer altid er sat mindst én gang
