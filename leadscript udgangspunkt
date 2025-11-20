@@ -1,0 +1,169 @@
+<script>
+(function() {
+  // ----------- Helpers -----------
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
+  }
+
+  function getAffiliateCookieAge() {
+    var createdAt = getCookie("affiliate_set_at"); // sat ved klik
+    if (!createdAt) {
+      return {
+        createdAt: null,
+        ageSeconds: null,
+        ageDays: null
+      };
+    }
+
+    var createdMs = Date.parse(createdAt);
+    if (isNaN(createdMs)) {
+      return {
+        createdAt: createdAt,
+        ageSeconds: null,
+        ageDays: null
+      };
+    }
+
+    var nowMs = Date.now();
+    var diffMs = nowMs - createdMs;
+    if (diffMs < 0) {
+      // Tidszone/sync rod, men vi sender bare null
+      return {
+        createdAt: createdAt,
+        ageSeconds: null,
+        ageDays: null
+      };
+    }
+
+    var ageSeconds = Math.floor(diffMs / 1000);
+    var ageDays    = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    return {
+      createdAt: createdAt,
+      ageSeconds: ageSeconds,
+      ageDays: ageDays
+    };
+  }
+
+  /**
+   * Send lead til Xano
+   *
+   * options = {
+   *   store: "shop-identifier",
+   *   navn: "Kunde Navn",
+   *   info: { email: "...", phone: "...", ... },
+   *   ip: "optional-ip"
+   * }
+   */
+  function sendLead(options) {
+    var store = options.store || getCookie("store") || "";
+    var navn  = options.navn || "";
+    var info  = options.info || {};
+    var ip    = options.ip || "";
+
+    var affIdCookie = getCookie("affiliate_id");
+    var aff_id = affIdCookie ? parseInt(affIdCookie, 10) : null;
+    if (isNaN(aff_id)) aff_id = null;
+
+    var referrerCookie = getCookie("referrer") || getCookie("refferer");
+    var refferer = referrerCookie || document.referrer || "";
+
+    var fullUrl = window.location.href;
+
+    var cookieMeta = getAffiliateCookieAge();
+
+    var payload = {
+      store: store,
+      refferer: refferer,
+      aff_id: aff_id,
+      info: info,
+      ip: ip,
+      navn: navn,
+
+      full_url: fullUrl,
+      cookie_age_days: cookieMeta.ageDays,
+      cookie_age_seconds: cookieMeta.ageSeconds,
+      cookie_created_at: cookieMeta.createdAt
+    };
+
+    console.log("Sending lead payload:", payload);
+
+    return fetch("https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/sales/lead", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    }).then(function(res) {
+      if (!res.ok) {
+        console.error("Lead API error status:", res.status, res.statusText);
+      }
+      return res.json().catch(function() {
+        return null;
+      });
+    }).catch(function(err) {
+      console.error("Lead API network error:", err);
+      throw err;
+    });
+  }
+
+  // ----------- Eksempel: hook til en form -----------
+  // Du kan tilpasse selector og feltnavne som du vil
+  document.addEventListener("DOMContentLoaded", function() {
+    var form = document.querySelector("#lead-form"); // ændr til din form-id/klasse
+    if (!form) {
+      console.log("Lead form not found, skipping lead binding.");
+      return;
+    }
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      // Eksempel-felter – tilpas navne til din form
+      var navnField  = form.querySelector("[name='navn']");
+      var emailField = form.querySelector("[name='email']");
+      var phoneField = form.querySelector("[name='phone']");
+      var messageField = form.querySelector("[name='message']");
+
+      var navn    = navnField  ? navnField.value.trim()  : "";
+      var email   = emailField ? emailField.value.trim() : "";
+      var phone   = phoneField ? phoneField.value.trim() : "";
+      var message = messageField ? messageField.value.trim() : "";
+
+      // Det der ryger i "info"-feltet i Xano (object)
+      var info = {
+        email: email,
+        phone: phone,
+        message: message
+        // tilføj flere felter her efter behov
+      };
+
+      // Hvis du vil override store manuelt:
+      var storeFromCookie = getCookie("store");
+      var storeIdentifier = storeFromCookie || "demo-store"; // fallback
+
+      sendLead({
+        store: storeIdentifier,
+        navn: navn,
+        info: info,
+        ip: "" // hvis du senere vil sende ip, kan du sætte det her
+      }).then(function(response) {
+        console.log("Lead API response:", response);
+        // Her kan du fx vise "tak for din henvendelse"
+        // alert("Tak for din henvendelse!");
+      }).catch(function() {
+        // Evt. vis en fejlbesked til brugeren
+        // alert("Noget gik galt. Prøv igen.");
+      });
+    });
+  });
+
+  // Eksponer funktionen globalt hvis du vil kalde den manuelt:
+  window.AffilyflowLead = {
+    sendLead: sendLead
+  };
+})();
+</script>
