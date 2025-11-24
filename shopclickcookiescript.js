@@ -2,7 +2,14 @@
 document.addEventListener("DOMContentLoaded", function() {
   "use strict";
 
-  // ---------- Helpers ----------
+  // ------------------------------
+  // Version tag
+  // ------------------------------
+  const AFFILYFLOW_SCRIPT_VERSION = "1.0.7";
+
+  // ------------------------------
+  // Helpers
+  // ------------------------------
   function setCookie(name, value, days) {
     let expires = "";
     if (days) {
@@ -23,18 +30,66 @@ document.addEventListener("DOMContentLoaded", function() {
     return null;
   }
 
-  // Simpel hash til at lave unikke cookie-navne pr. (aff_id + store + url)
   function hashString(str) {
     let hash = 0;
     if (!str || !str.length) return hash.toString();
     for (let i = 0; i < str.length; i++) {
       hash = ((hash << 5) - hash) + str.charCodeAt(i);
-      hash |= 0; // konverter til 32-bit int
+      hash |= 0;
     }
-    return Math.abs(hash).toString(36); // base36 -> kort og cookie-venligt
+    return Math.abs(hash).toString(36);
   }
 
-  // ---------- URL / basic data ----------
+  function getStoreMeta() {
+    return {
+      store_url: window.location.origin,
+      hostname: window.location.hostname,
+      shopify_store: (window.Shopify && window.Shopify.shop) ? window.Shopify.shop : null
+    };
+  }
+
+  // ------------------------------
+  // Heartbeat sender
+  // ------------------------------
+  function sendHeartbeat(type = "heartbeat") {
+    const meta = getStoreMeta();
+
+    fetch("https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/scriptping", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        type: type,
+        version: AFFILYFLOW_SCRIPT_VERSION,
+        store_url: meta.store_url,
+        hostname: meta.hostname,
+        shopify_store: meta.shopify_store
+      })
+    }).catch(() => {});
+  }
+
+  // Send installed once per session
+  try {
+    if (!sessionStorage.getItem("affilyflow_script_installed")) {
+      sendHeartbeat("installed");
+      sessionStorage.setItem("affilyflow_script_installed", "1");
+    }
+  } catch(e) {}
+
+  // Always ping on load
+  sendHeartbeat("heartbeat");
+
+  // Ping every 5 minutes
+  setInterval(function () {
+    sendHeartbeat("interval");
+  }, 5 * 60 * 1000);
+
+  // ------------------------------
+  // CLICK TRACKING (uændret)
+  // ------------------------------
+
   const urlParams = new URLSearchParams(window.location.search);
 
   const affiliateId = urlParams.get("aff_id");
@@ -43,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const fullUrl    = window.location.href;
   const referrer   = document.referrer || "Direct";
 
-  // ---------- Sæt cookies for tracking (uanset network) ----------
+  // Sæt cookies
   if (affiliateId && network && store) {
     setCookie("affiliate_id", affiliateId, 40);
     setCookie("network", network, 40);
@@ -51,28 +106,22 @@ document.addEventListener("DOMContentLoaded", function() {
     setCookie("full_url", fullUrl, 40);
     setCookie("referrer", referrer, 40);
     setCookie("affiliate_set_at", new Date().toISOString(), 40);
-
   }
 
-  // Sørg for at referrer altid er sat mindst én gang
   if (!getCookie("referrer")) {
     setCookie("referrer", referrer, 40);
   }
 
-  // ---------- Kun klik-tracking for Affilyflow ----------
+  // Klik-tracking kun for affilyflow
   if (network && network.toLowerCase() === "affilyflow" && affiliateId && store) {
 
-    // Nøgle til "samme bruger + samme URL + samme affiliate"
     const clickKey = `${affiliateId}|${store}|${fullUrl}`;
     const clickCookieName = "af_click_" + hashString(clickKey);
 
-    // Hvis cookie eksisterer, har vi allerede registreret dette klik
     if (getCookie(clickCookieName)) {
-      // Allerede tracket denne (aff_id + store + url) kombination inden for 40 dage
       return;
     }
 
-    // ---------- Ekstra data, der er nyttig for affiliates ----------
     const userAgent   = navigator.userAgent || "";
     const language    = navigator.language || "";
     const screenWidth = (window.screen && window.screen.width)  || null;
@@ -81,7 +130,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const pageTitle   = document.title || "";
     const timestamp   = new Date().toISOString();
 
-    // Typiske UTM-parametre, hvis du vil køre omnichannel / bedre attribution
     const utmSource   = urlParams.get("utm_source");
     const utmMedium   = urlParams.get("utm_medium");
     const utmCampaign = urlParams.get("utm_campaign");
@@ -103,14 +151,12 @@ document.addEventListener("DOMContentLoaded", function() {
       timestamp: timestamp
     };
 
-    // Tilføj kun UTM-felter, hvis de faktisk findes
-    if (utmSource)   payload.utm_source   = utmSource;
-    if (utmMedium)   payload.utm_medium   = utmMedium;
+    if (utmSource)   payload.utm_source = utmSource;
+    if (utmMedium)   payload.utm_medium = utmMedium;
     if (utmCampaign) payload.utm_campaign = utmCampaign;
-    if (utmTerm)     payload.utm_term     = utmTerm;
-    if (utmContent)  payload.utm_content  = utmContent;
+    if (utmTerm)     payload.utm_term = utmTerm;
+    if (utmContent)  payload.utm_content = utmContent;
 
-    // ---------- Send til API ----------
     fetch("https://xepn-38qp-in4n.f2.xano.io/api:-WVr0FO_/clicks/click", {
       method: "POST",
       headers: {
@@ -118,22 +164,20 @@ document.addEventListener("DOMContentLoaded", function() {
       },
       body: JSON.stringify(payload)
     })
-      .then(function(response) {
-        if (!response.ok) {
-          console.error("API Error (status):", response.status, response.statusText);
-          return null;
-        }
-        // Hvis vi når hertil, regner vi med at klikket er registreret → sæt dedupe-cookie
-        setCookie(clickCookieName, "1", 40);
-        return response.json().catch(function() {
-          // Hvis body ikke er JSON, er det ligemeget her
-          return null;
-        });
-      })
-      .catch(function(error) {
-        console.error("API Error (network):", error);
-      });
+    .then(function(response) {
+      if (!response.ok) {
+        console.error("API Error (status):", response.status, response.statusText);
+        return null;
+      }
+      setCookie(clickCookieName, "1", 40);
+      return response.json().catch(function() { return null; });
+    })
+    .catch(function(error) {
+      console.error("API Error (network):", error);
+    });
+
   }
+
 });
 </script>
 
