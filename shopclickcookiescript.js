@@ -4,7 +4,7 @@
   // ------------------------------------------------------------
   // Config
   // ------------------------------------------------------------
-  const AFFILYFLOW_SCRIPT_VERSION = "1.0.7-debug";
+  const AFFILYFLOW_SCRIPT_VERSION = "1.0.8";
   const LOG_PREFIX = `[Affilyflow ${AFFILYFLOW_SCRIPT_VERSION}]`;
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -77,7 +77,7 @@
       expires = "; expires=" + date.toUTCString();
     }
 
-    // NOTE: SameSite/Secure not set. That’s usually fine for first-party cookies.
+    // NOTE: SameSite/Secure not set. That's usually fine for first-party cookies.
     // If you need cross-site attribution in modern browsers, you need a different approach.
     const cookieString = `${name}=${encodeURIComponent(value || "")}${expires}; path=/;`;
     document.cookie = cookieString;
@@ -292,19 +292,42 @@
       return;
     }
 
-    // Dedupe cookie
-    const clickKey = `${affiliateId}|${store}|${fullUrl}`;
+    // ------------------------------------------------------------
+    // IMPROVED DEDUPE: Only based on affiliate_id + store
+    // This prevents duplicate clicks on refresh/navigation within same affiliate session
+    // but allows new clicks when affiliate_id changes
+    // ------------------------------------------------------------
+    const clickKey = `${affiliateId}|${store}`;
     const clickCookieName = "af_click_" + hashString(clickKey);
     const existingClick = getCookie(clickCookieName);
 
     group("DEDUPE", () => {
-      log("clickKey", clickKey);
+      log("clickKey (affiliate + store only)", clickKey);
       log("clickCookieName", clickCookieName);
       log("existingClickCookie", existingClick);
+      
+      // Log previous click data if exists
+      if (existingClick) {
+        const parsed = safeJsonParse(existingClick);
+        if (parsed) {
+          log("Previous click data", {
+            aff_id: parsed.aff_id,
+            store: parsed.store,
+            timestamp: parsed.timestamp,
+            daysAgo: parsed.timestamp ? 
+              Math.floor((Date.now() - new Date(parsed.timestamp).getTime()) / (1000 * 60 * 60 * 24)) : 
+              null
+          });
+        } else {
+          log("Previous click value (legacy format)", existingClick);
+        }
+      } else {
+        log("No previous click found - will track new click");
+      }
     });
 
     if (existingClick) {
-      warn("Click already recorded (dedupe cookie exists). Exiting.");
+      warn(`Click already recorded for affiliate ${affiliateId} on store ${store}. Skipping duplicate.`);
       return;
     }
 
@@ -360,8 +383,15 @@
           return null;
         }
 
-        // Only set dedupe cookie on success
-        setCookie(clickCookieName, "1", 40);
+        // Only set dedupe cookie on success - store metadata for debugging
+        const clickData = JSON.stringify({
+          aff_id: affiliateId,
+          store: store,
+          timestamp: new Date().toISOString(),
+          initial_url: fullUrl
+        });
+        setCookie(clickCookieName, clickData, 40);
+        log("Dedupe cookie set successfully", { clickCookieName, data: clickData });
 
         // Try parse response for debugging
         let text = null;
@@ -395,8 +425,6 @@
     err("Fatal init error", e);
   }
 })();
-
-
 
 
 
